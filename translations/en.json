@@ -1,0 +1,60 @@
+{
+  "title": "Dashboard MCP",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Dashboard MCP for Morgan",
+        "description": "Select the dashboards Morgan may query. The MCP endpoint is /api/mcp/dashboard_mcp. No dashboards are exposed by default.",
+        "data": {
+          "dashboards": "Exposed dashboards",
+          "blocked_entities": "Redacted entities (all tools)",
+          "mode": "Condition evaluation mode",
+          "include_condition_states": "Allow read-only access to condition helpers",
+          "extra_read_entities": "Additional read-only entities",
+          "viewer_user_id": "Dashboard viewer user ID (optional; blank means unknown)",
+          "keep_image_paths": "Keep image URLs in information records",
+          "enable_yaml_export": "Enable YAML inspection (smart mode only)"
+        },
+        "data_description": {
+          "dashboards": "Only selected dashboards can be searched or read. New dashboards are not added automatically.",
+          "blocked_entities": "Matching references are replaced with [REDACTED_ENTITY]. Their states are never returned.",
+          "mode": "Dumb evaluates conditions in the integration. Smart returns conditions for the agent to evaluate.",
+          "include_condition_states": "Permit reading helpers referenced by conditions, even if they are not a displayed control. Does not permit changing them.",
+          "extra_read_entities": "Explicit read access regardless of dashboard conditions. Entity redaction still overrides it.",
+          "viewer_user_id": "Used only for user visibility conditions. Do not enter the MCP administrator ID unless it really is the intended dashboard viewer.",
+          "enable_yaml_export": "Returns resolved YAML with redaction. Disabled in dumb mode to prevent bypassing evaluated restrictions."
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Dashboard MCP is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Dashboard access and evaluation",
+        "description": "Settings apply to subsequent requests immediately.",
+        "data": {
+          "dashboards": "Exposed dashboards",
+          "blocked_entities": "Redacted entities (all tools)",
+          "mode": "Condition evaluation mode",
+          "include_condition_states": "Allow read-only access to condition helpers",
+          "extra_read_entities": "Additional read-only entities",
+          "viewer_user_id": "Dashboard viewer user ID (optional; blank means unknown)",
+          "keep_image_paths": "Keep image URLs in information records",
+          "enable_yaml_export": "Enable YAML inspection (smart mode only)"
+        },
+        "data_description": {
+          "dashboards": "Only selected dashboards can be searched or read. New dashboards are not added automatically.",
+          "blocked_entities": "Matching references are replaced with [REDACTED_ENTITY]. Their states are never returned.",
+          "mode": "Dumb evaluates conditions in the integration. Smart returns conditions for the agent to evaluate.",
+          "include_condition_states": "Permit reading helpers referenced by conditions, even if they are not a displayed control. Does not permit changing them.",
+          "extra_read_entities": "Explicit read access regardless of dashboard conditions. Entity redaction still overrides it.",
+          "viewer_user_id": "Used only for user visibility conditions. Do not enter the MCP administrator ID unless it really is the intended dashboard viewer.",
+          "enable_yaml_export": "Returns resolved YAML with redaction. Disabled in dumb mode to prevent bypassing evaluated restrictions."
+        }
+      }
+    }
+  }
+}
