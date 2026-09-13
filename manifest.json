@@ -1,0 +1,13 @@
+{
+  "domain": "dashboard_mcp",
+  "name": "Dashboard MCP",
+  "version": "0.1.0",
+  "config_flow": true,
+  "dependencies": ["lovelace", "llm", "mcp_server"],
+  "documentation": "https://www.home-assistant.io/integrations/mcp_server/",
+  "codeowners": [],
+  "integration_type": "service",
+  "iot_class": "local_polling",
+  "requirements": [],
+  "single_config_entry": true
+}
