@@ -16,6 +16,12 @@ def schema(hass, current):
     known = {x["value"] for x in choices}
     choices += [{"value": d, "label": f"Missing dashboard: {d}"} for d in current["dashboards"] if d not in known]
     return vol.Schema({
+        vol.Required("semantic_search", default=current["semantic_search"]): bool,
+        vol.Optional("embedding_base_url", default=current["embedding_base_url"]): selector.TextSelector(),
+        vol.Optional("embedding_api_key", default=current["embedding_api_key"]): selector.TextSelector(selector.TextSelectorConfig(type="password")),
+        vol.Optional("embedding_model", default=current["embedding_model"]): selector.TextSelector(),
+        vol.Required("embedding_batch_size", default=current["embedding_batch_size"]): vol.All(vol.Coerce(int), vol.Range(min=1, max=64)),
+        vol.Required("embedding_min_similarity", default=current["embedding_min_similarity"]): vol.All(vol.Coerce(float), vol.Range(min=-1, max=1)),
         vol.Optional("dashboards", default=current["dashboards"]): selector.SelectSelector(selector.SelectSelectorConfig(options=choices, multiple=True, mode="dropdown")),
         vol.Optional("blocked_entities", default=current["blocked_entities"]): selector.EntitySelector(selector.EntitySelectorConfig(multiple=True)),
         vol.Required("mode", default=current["mode"]): selector.SelectSelector(selector.SelectSelectorConfig(options=[{"value": "dumb", "label": "Dumb — server evaluates conditions"}, {"value": "smart", "label": "Smart — agent evaluates conditions"}])),
