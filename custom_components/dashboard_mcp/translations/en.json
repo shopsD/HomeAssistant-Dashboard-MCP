@@ -13,7 +13,13 @@
           "extra_read_entities": "Additional read-only entities",
           "viewer_user_id": "Dashboard viewer user ID (optional; blank means unknown)",
           "keep_image_paths": "Keep image URLs in information records",
-          "enable_yaml_export": "Enable YAML inspection (smart mode only)"
+          "enable_yaml_export": "Enable YAML inspection (smart mode only)",
+          "semantic_search": "Enable semantic search",
+          "embedding_base_url": "LocalAI base URL (including /v1)",
+          "embedding_api_key": "Embedding API key (optional)",
+          "embedding_model": "Embedding model name",
+          "embedding_batch_size": "Embedding batch size",
+          "embedding_min_similarity": "Minimum cosine similarity"
         },
         "data_description": {
           "dashboards": "Only selected dashboards can be searched or read. New dashboards are not added automatically.",
@@ -22,7 +28,12 @@
           "include_condition_states": "Permit reading helpers referenced by conditions, even if they are not a displayed control. Does not permit changing them.",
           "extra_read_entities": "Explicit read access regardless of dashboard conditions. Entity redaction still overrides it.",
           "viewer_user_id": "Used only for user visibility conditions. Do not enter the MCP administrator ID unless it really is the intended dashboard viewer.",
-          "enable_yaml_export": "Returns resolved YAML with redaction. Disabled in dumb mode to prevent bypassing evaluated restrictions."
+          "enable_yaml_export": "Returns resolved YAML with redaction. Disabled in dumb mode to prevent bypassing evaluated restrictions.",
+          "semantic_search": "Embeds selected catalogue text using your configured endpoint. Keyword search remains available during indexing.",
+          "embedding_base_url": "Example: http://localai:8080/v1. The integration appends /embeddings.",
+          "embedding_model": "Exact model identifier registered in LocalAI. Changing the model or endpoint rebuilds the index.",
+          "embedding_batch_size": "Documents per request, 1–64. Reduce if LocalAI runs out of memory.",
+          "embedding_min_similarity": "Semantic match cutoff from -1 to 1. Default 0.45 is a starting point; calibrate with your model and catalogue."
         }
       }
     },
@@ -43,7 +54,13 @@
           "extra_read_entities": "Additional read-only entities",
           "viewer_user_id": "Dashboard viewer user ID (optional; blank means unknown)",
           "keep_image_paths": "Keep image URLs in information records",
-          "enable_yaml_export": "Enable YAML inspection (smart mode only)"
+          "enable_yaml_export": "Enable YAML inspection (smart mode only)",
+          "semantic_search": "Enable semantic search",
+          "embedding_base_url": "LocalAI base URL (including /v1)",
+          "embedding_api_key": "Embedding API key (optional)",
+          "embedding_model": "Embedding model name",
+          "embedding_batch_size": "Embedding batch size",
+          "embedding_min_similarity": "Minimum cosine similarity"
         },
         "data_description": {
           "dashboards": "Only selected dashboards can be searched or read. New dashboards are not added automatically.",
@@ -52,7 +69,12 @@
           "include_condition_states": "Permit reading helpers referenced by conditions, even if they are not a displayed control. Does not permit changing them.",
           "extra_read_entities": "Explicit read access regardless of dashboard conditions. Entity redaction still overrides it.",
           "viewer_user_id": "Used only for user visibility conditions. Do not enter the MCP administrator ID unless it really is the intended dashboard viewer.",
-          "enable_yaml_export": "Returns resolved YAML with redaction. Disabled in dumb mode to prevent bypassing evaluated restrictions."
+          "enable_yaml_export": "Returns resolved YAML with redaction. Disabled in dumb mode to prevent bypassing evaluated restrictions.",
+          "semantic_search": "Embeds selected catalogue text using your configured endpoint. Keyword search remains available during indexing.",
+          "embedding_base_url": "Example: http://localai:8080/v1. The integration appends /embeddings.",
+          "embedding_model": "Exact model identifier registered in LocalAI. Changing the model or endpoint rebuilds the index.",
+          "embedding_batch_size": "Documents per request, 1–64. Reduce if LocalAI runs out of memory.",
+          "embedding_min_similarity": "Semantic match cutoff from -1 to 1. Default 0.45 is a starting point; calibrate with your model and catalogue."
         }
       }
     }

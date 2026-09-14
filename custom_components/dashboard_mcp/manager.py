@@ -12,6 +12,7 @@ from .catalogue import Redactor, compile_dashboard, delimited, public_state, ran
 from .const import DEFAULT_OPTIONS
 from .converter import mk_or
 from .evaluator import evaluate
+from .embeddings import EmbeddingIndex
 
 
 class DashboardManager:
@@ -22,6 +23,7 @@ class DashboardManager:
         self._lock = asyncio.Lock()
         self._fingerprint = None
         self._records = []
+        self.index = EmbeddingIndex(hass, entry, self)
 
     @property
     def options(self):
@@ -45,6 +47,7 @@ class DashboardManager:
                     self._records = []
                     raise HomeAssistantError("Dashboard conversion failed. No stale catalogue was served.") from exc
                 self._records, self._fingerprint = records, fingerprint
+                self.index.invalidate()
             # Settings revocation during a slow YAML load/compile cannot be bypassed.
             if not self.active or options != self.options:
                 raise HomeAssistantError("Dashboard configuration changed during the request. Retry.")
@@ -60,12 +63,20 @@ class DashboardManager:
             return options, metadata, data, list(self._records), states
 
     async def call(self, tool: str, args: dict) -> dict:
+        # Embed before taking the live permission snapshot; LocalAI may be slow.
+        prepared = await self.index.query(args["query"]) if tool == "search_dashboard_context" else None
         options, metadata, data, records, states = await self.snapshot()
         redactor = Redactor(options["blocked_entities"])
         rendered = [render_record(r, options, states, False) for r in records]
         # Public revision derives from redacted content and current access decisions,
         # never hashes of private entity IDs or hidden payload.
+        search_rows, search_backend = ([], "keyword")
+        if tool == "search_dashboard_context":
+            search_rows, search_backend = self.index.search(rendered, args["query"], prepared)
         public_revision = revision([options["mode"], rendered, redactor.clean(metadata)])
+        if tool == "search_dashboard_context":
+            public_revision = revision([public_revision, search_backend, args["query"],
+                                        args.get("dashboard_id"), [r["id"] for r in search_rows]])
         common = {"mode": options["mode"], "revision": public_revision, "checked_at": datetime.now(timezone.utc).isoformat(), "read_only": True}
         if tool == "list_dashboards":
             result = {"status": "ok", "dashboards": redactor.clean(metadata)}
@@ -77,9 +88,9 @@ class DashboardManager:
                 raise HomeAssistantError("Dashboard is not available.")
             rows = [r for r in rendered if not wanted or r["dashboard_id"] == wanted]
             if tool == "search_dashboard_context":
-                rows = ranked_search(rows, args["query"])
+                rows = [r for r in search_rows if not wanted or r["dashboard_id"] == wanted]
             total = len(rows)
-            offset, limit = args.get("offset", 0), args.get("limit", 8)
+            offset, limit = args.get("offset", 0), args.get("limit", 500)
             page = rows[offset:offset + limit]
             if args.get("include_states", False):
                 selected = {r["id"] for r in page}
@@ -87,6 +98,8 @@ class DashboardManager:
                 page = [detailed[r["id"]] for r in page]
             result = {"status": "matches" if total else "no_match" if tool == "search_dashboard_context" else "empty", "total": total, "offset": offset, "next_offset": offset + len(page) if offset + len(page) < total else None, "records": page}
             if tool == "search_dashboard_context":
+                result["search_backend"] = search_backend.split(":", 1)[0]
+                result["index_status"] = self.index.status["state"]
                 if not options["dashboards"]:
                     result["status"] = "not_configured"
                 result["web_fallback_candidate"] = total == 0 and bool(options["dashboards"])

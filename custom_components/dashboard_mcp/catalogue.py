@@ -193,3 +193,36 @@ def delimited(records: list[dict]) -> str:
 
 def revision(value: Any) -> str:
     return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True, default=str).encode()).hexdigest()
+
+
+def search_chunks(record: dict) -> dict[str, str]:
+    """Content hashes omit live states and access decisions. Bounded overlapping chunks."""
+    header = "\n".join(str(record.get(k, "")) for k in
+                       ("name", "entity_id", "section", "labels", "capability"))
+    text = header + "\n" + str(record.get("text", ""))
+    return {revision(chunk): chunk for start in range(0, len(text), 1600)
+            if (chunk := text[start:start + 2000]).strip()}
+
+
+def hybrid_search(records, query, vector, vectors, minimum):
+    """Rank current, rendered records only; never retrieve payload from the index."""
+    lexical = ranked_search(records, query)
+    scores = {r["id"]: 1 / (60 + rank) for rank, r in enumerate(lexical, 1)}
+    semantic = []
+    for row in records:
+        if row.get("access") in {"restricted", "undetermined", "redacted"}:
+            continue
+        # All chunks must still match current rendered content. A stale or gated
+        # record must not be discoverable from embeddings of its old payload.
+        keys = search_chunks(row)
+        if not keys or any(key not in vectors for key in keys):
+            continue
+        similarity = max(sum(a * b for a, b in zip(vector, vectors[key])) for key in keys)
+        if similarity >= minimum:
+            semantic.append((similarity, row["id"]))
+    for rank, (_, rid) in enumerate(sorted(semantic, key=lambda x: (-x[0], x[1])), 1):
+        scores[rid] = scores.get(rid, 0) + 1 / (60 + rank)
+    exact = query.casefold().strip()
+    return sorted((r for r in records if r["id"] in scores), key=lambda r: (
+        -int(bool(r.get("entity_id")) and r["entity_id"].casefold() == exact),
+        -scores[r["id"]], r["id"]))
