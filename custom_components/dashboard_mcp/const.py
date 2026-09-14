@@ -3,6 +3,12 @@
 DOMAIN = "dashboard_mcp"
 API_ID = "dashboard_mcp"
 DEFAULT_OPTIONS = {
+    "semantic_search": False,
+    "embedding_base_url": "",
+    "embedding_api_key": "",
+    "embedding_model": "",
+    "embedding_batch_size": 8,
+    "embedding_min_similarity": 0.45,
     "dashboards": [],
     "blocked_entities": [],
     "mode": "dumb",
