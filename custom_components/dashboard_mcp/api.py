@@ -8,32 +8,57 @@ from homeassistant.helpers import llm
 from .const import API_ID, PROMPT
 
 ENTITY = vol.All(str, vol.Match(r"^[a-z_][a-z0-9_]*\.[a-z0-9_]+$"))
-MODE = {vol.Optional("mode"): vol.In(["smart", "dumb"])}
+MODE = {
+    vol.Optional("mode", description=(
+        "Override condition evaluation for this call: 'dumb' evaluates visibility "
+        "conditions server-side and withholds restricted content; 'smart' returns "
+        "conditions for the caller to evaluate before use. Omit to use the configured "
+        "default. Available only when Allow tool override is enabled."
+    )): vol.In(["smart", "dumb"]),
+}
 PAGE = {
     **MODE,
-    vol.Optional("dashboard_id"): vol.All(str, vol.Length(min=1, max=200)),
-    vol.Optional("limit", default=500): vol.All(int, vol.Range(min=1, max=5000)),
-    vol.Optional("offset", default=0): vol.All(int, vol.Range(min=0)),
-    vol.Optional("revision"): str,
-    vol.Optional("include_states", default=False): bool,
-    vol.Optional("format", default="records"): vol.In(["records", "delimited"]),
+    vol.Optional("dashboard_id", description=(
+        "Only return records belonging to this selected dashboard ID. "
+        "Use list_dashboards to discover IDs; omit to include all selected dashboards."
+    )): vol.All(str, vol.Length(min=1, max=200)),
+    vol.Optional("limit", default=500, description=(
+        "Maximum records in this page, 1 to 5000. Default 500."
+    )): vol.All(int, vol.Range(min=1, max=5000)),
+    vol.Optional("offset", default=0, description=(
+        "Zero-based position of the first record in this page. "
+        "Use next_offset from the previous response to continue."
+    )): vol.All(int, vol.Range(min=0)),
+    vol.Optional("revision", description=(
+        "Revision returned by the first page. Supply it on subsequent pages "
+        "to detect changed catalogue content or permission decisions."
+    )): str,
+    vol.Optional("include_states", default=False, description=(
+        "Include available live entity states and, when configured, states "
+        "of entities referenced in record conditions. Default false."
+    )): bool,
+    vol.Optional("format", default="records", description=(
+        "'records' returns structured JSON objects (default). 'delimited' returns "
+        "a compact text table with a header row; fields are separated by ¦, "
+        "line breaks within fields are encoded as ↵, and literal field delimiters "
+        "are escaped as \\¦."
+    )): vol.In(["records", "delimited"]),
     vol.Optional("max_chars", default=250000, description=(
         "Maximum response size in characters. Default 250000. "
         "Use 0 for no character limit. Exceeding this raises an "
         "error; it does not truncate the response."
     )): vol.All(int, vol.Range(min=0)),
-    
 }
 TOOLS = {
     "list_dashboards": ("List only the dashboards selected for this property database.", vol.Schema(MODE)),
     "search_dashboard_context": (
         "FIRST lookup for every property question or action. Search entity names, IDs, panels, rules and information. Returns complete conditions and evaluated permissions in dumb mode. Restricted/error is not a web fallback. Set include_states for current values.",
-        vol.Schema({vol.Required("query"): vol.All(str, vol.Length(min=1, max=300)), **PAGE}),
+        vol.Schema({vol.Required("query", description="Required search text, 1 to 300 characters. Matches dashboard names, sections, entities, rules and information."): vol.All(str, vol.Length(min=1, max=300)), **PAGE}),
     ),
     "get_dashboard_context": ("Read a page of the property catalogue. Use revision from the previous page to prevent mixing changed permissions. Normally search first.", vol.Schema(PAGE)),
-    "get_entity_state": ("Read one permitted entity's current state. Does not execute actions or grant control. Blocklist always applies.", vol.Schema({vol.Required("entity_id"): ENTITY, **MODE})),
-    "get_entity_states": ("Read up to 5000 permitted entities in a single current snapshot. Default is 50. Does not execute actions.", vol.Schema({vol.Required("entity_ids"): vol.All([ENTITY], vol.Length(min=1, max=5000)), **MODE})),
-    "get_dashboard_yaml": ("Inspect resolved dashboard YAML with entity redaction. Optional smart-mode tool; not evaluated permissions.", vol.Schema({vol.Required("dashboard_id"): str, **MODE})),
+    "get_entity_state": ("Read one permitted entity's current state. Does not execute actions or grant control. Blocklist always applies.", vol.Schema({vol.Required("entity_id", description="Full Home Assistant entity ID to read, such as sensor.kitchen_temperature."): ENTITY, **MODE})),
+    "get_entity_states": ("Read up to 5000 permitted entities in a single current snapshot. Default is 50. Does not execute actions.", vol.Schema({vol.Required("entity_ids", description="List of 1 to 5000 complete Home Assistant entity IDs to read in one request."): vol.All([ENTITY], vol.Length(min=1, max=5000)), **MODE})),
+    "get_dashboard_yaml": ("Inspect resolved dashboard YAML with entity redaction. Optional smart-mode tool; not evaluated permissions.", vol.Schema({vol.Required("dashboard_id", description="Selected dashboard ID whose resolved redacted YAML should be inspected."): str, **MODE})),
 }
 
 
