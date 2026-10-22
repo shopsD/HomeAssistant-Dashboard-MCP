@@ -12,6 +12,7 @@ DEFAULT_OPTIONS = {
     "dashboards": [],
     "blocked_entities": [],
     "mode": "dumb",
+    "allow_tool_override": False,
     "include_condition_states": True,
     "extra_read_entities": [],
     "viewer_user_id": "",
