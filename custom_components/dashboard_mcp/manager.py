@@ -9,7 +9,7 @@ from homeassistant.exceptions import HomeAssistantError
 
 from .adapter import load_dashboards
 from .catalogue import Redactor, compile_dashboard, delimited, public_state, ranked_search, render_record, revision
-from .const import DEFAULT_OPTIONS
+from .const import resolved_options
 from .converter import mk_or
 from .evaluator import evaluate
 from .embeddings import EmbeddingIndex
@@ -27,7 +27,7 @@ class DashboardManager:
 
     @property
     def options(self):
-        return {**DEFAULT_OPTIONS, **self.entry.data, **self.entry.options}
+        return resolved_options({**self.entry.data, **self.entry.options})
 
     async def snapshot(self):
         if not self.active:
@@ -76,7 +76,7 @@ class DashboardManager:
         if options["mode"] == "dumb":
             rendered = [
                 row for row in rendered
-                if not options.get(f"dumb_omit_{row['access']}", False)
+                if options.get(f"dumb_{row['access']}_handling", "keep") != "omit"
             ]
         # Public revision derives from redacted content and current access decisions,
         # never hashes of private entity IDs or hidden payload.
@@ -168,7 +168,7 @@ class DashboardManager:
             if options["mode"] == "dumb":
                 rendered_appearances = [
                     row for row in rendered_appearances
-                    if not options.get(f"dumb_omit_{row['access']}", False)
+                    if options.get(f"dumb_{row['access']}_handling", "keep") != "omit"
                 ]
             if rendered_appearances:
                 result["appearances"] = rendered_appearances

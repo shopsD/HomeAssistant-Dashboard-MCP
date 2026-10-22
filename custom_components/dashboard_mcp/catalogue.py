@@ -171,7 +171,7 @@ def render_record(record: Record, options: dict, states: dict, include_states: b
             if result[key]:
                 result[key] = "[RESTRICTED_CONTENT]"
     if options["mode"] == "dumb" and status in {"restricted", "undetermined"}:
-        if options.get(f"dumb_redact_{status}_entity_id", False) and entity:
+        if options.get(f"dumb_{status}_handling", "keep") == "redact_entity_id" and entity:
             result["entity_id"] = REDACTED
         result["condition"] = redact_record_condition(
             result["condition"], entity, options.get(f"dumb_{status}_condition", "keep")

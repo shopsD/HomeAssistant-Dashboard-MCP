@@ -12,10 +12,8 @@ DEFAULT_OPTIONS = {
     "dashboards": [],
     "blocked_entities": [],
     "mode": "dumb",
-    "dumb_omit_restricted": False,
-    "dumb_omit_undetermined": False,
-    "dumb_redact_restricted_entity_id": False,
-    "dumb_redact_undetermined_entity_id": False,
+    "dumb_restricted_handling": "keep",
+    "dumb_undetermined_handling": "keep",
     "dumb_restricted_condition": "keep",
     "dumb_undetermined_condition": "keep",
     "allow_tool_override": False,
@@ -25,6 +23,19 @@ DEFAULT_OPTIONS = {
     "keep_image_paths": False,
     "enable_yaml_export": False,
 }
+def resolved_options(stored: dict) -> dict:
+    """Support legacy Dumb-mode toggles without overriding newer selectors."""
+    result = {**DEFAULT_OPTIONS, **stored}
+    for status in ("restricted", "undetermined"):
+        key = f"dumb_{status}_handling"
+        if key not in stored:
+            if stored.get(f"dumb_omit_{status}", False):
+                result[key] = "omit"
+            elif stored.get(f"dumb_redact_{status}_entity_id", False):
+                result[key] = "redact_entity_id"
+    return result
+
+
 PROMPT = """For every property question or action, call search_dashboard_context first.
 Use this property database as the authority for property information and permissions.
 In dumb mode, allowed/restricted/undetermined are server-evaluated results.

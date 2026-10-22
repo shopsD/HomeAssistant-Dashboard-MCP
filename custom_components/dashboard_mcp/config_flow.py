@@ -7,7 +7,7 @@ from homeassistant.core import callback
 from homeassistant.helpers import selector
 
 from .adapter import dashboard_choices
-from .const import DEFAULT_OPTIONS, DOMAIN
+from .const import DEFAULT_OPTIONS, DOMAIN, resolved_options
 
 
 def schema(hass, current):
@@ -25,12 +25,10 @@ def schema(hass, current):
         vol.Optional("dashboards", default=current["dashboards"]): selector.SelectSelector(selector.SelectSelectorConfig(options=choices, multiple=True, mode="dropdown")),
         vol.Optional("blocked_entities", default=current["blocked_entities"]): selector.EntitySelector(selector.EntitySelectorConfig(multiple=True)),
         vol.Required("mode", default=current["mode"]): selector.SelectSelector(selector.SelectSelectorConfig(options=[{"value": "dumb", "label": "Dumb — server evaluates conditions"}, {"value": "smart", "label": "Smart — agent evaluates conditions"}])),
-        vol.Required("dumb_omit_restricted", default=current["dumb_omit_restricted"]): bool,
-        vol.Required("dumb_omit_undetermined", default=current["dumb_omit_undetermined"]): bool,
-        vol.Required("dumb_redact_restricted_entity_id", default=current["dumb_redact_restricted_entity_id"]): bool,
-        vol.Required("dumb_redact_undetermined_entity_id", default=current["dumb_redact_undetermined_entity_id"]): bool,
-        vol.Required("dumb_restricted_condition", default=current["dumb_restricted_condition"]): selector.SelectSelector(selector.SelectSelectorConfig(options=["keep", "redact_entities", "full_redact"])),
-        vol.Required("dumb_undetermined_condition", default=current["dumb_undetermined_condition"]): selector.SelectSelector(selector.SelectSelectorConfig(options=["keep", "redact_entities", "full_redact"])),
+        vol.Required("dumb_restricted_handling", default=current["dumb_restricted_handling"]): selector.SelectSelector(selector.SelectSelectorConfig(options=["keep", "redact_entity_id", "omit"], mode="dropdown", translation_key="record_handling")),
+        vol.Required("dumb_undetermined_handling", default=current["dumb_undetermined_handling"]): selector.SelectSelector(selector.SelectSelectorConfig(options=["keep", "redact_entity_id", "omit"], mode="dropdown", translation_key="record_handling")),
+        vol.Required("dumb_restricted_condition", default=current["dumb_restricted_condition"]): selector.SelectSelector(selector.SelectSelectorConfig(options=["keep", "redact_entities", "full_redact"], mode="dropdown", translation_key="condition_redaction")),
+        vol.Required("dumb_undetermined_condition", default=current["dumb_undetermined_condition"]): selector.SelectSelector(selector.SelectSelectorConfig(options=["keep", "redact_entities", "full_redact"], mode="dropdown", translation_key="condition_redaction")),
         vol.Required("allow_tool_override", default=current["allow_tool_override"]): bool,
         vol.Required("include_condition_states", default=current["include_condition_states"]): bool,
         vol.Optional("extra_read_entities", default=current["extra_read_entities"]): selector.EntitySelector(selector.EntitySelectorConfig(multiple=True)),
@@ -60,5 +58,5 @@ class DashboardOptionsFlow(config_entries.OptionsFlow):
     async def async_step_init(self, user_input=None):
         if user_input is not None:
             return self.async_create_entry(title="", data={**DEFAULT_OPTIONS, **user_input})
-        current = {**DEFAULT_OPTIONS, **self.config_entry.data, **self.config_entry.options}
+        current = resolved_options({**self.config_entry.data, **self.config_entry.options})
         return self.async_show_form(step_id="init", data_schema=schema(self.hass, current))
