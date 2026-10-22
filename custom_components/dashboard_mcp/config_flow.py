@@ -25,6 +25,7 @@ def schema(hass, current):
         vol.Optional("dashboards", default=current["dashboards"]): selector.SelectSelector(selector.SelectSelectorConfig(options=choices, multiple=True, mode="dropdown")),
         vol.Optional("blocked_entities", default=current["blocked_entities"]): selector.EntitySelector(selector.EntitySelectorConfig(multiple=True)),
         vol.Required("mode", default=current["mode"]): selector.SelectSelector(selector.SelectSelectorConfig(options=[{"value": "dumb", "label": "Dumb — server evaluates conditions"}, {"value": "smart", "label": "Smart — agent evaluates conditions"}])),
+        vol.Required("allow_tool_override", default=current["allow_tool_override"]): bool,
         vol.Required("include_condition_states", default=current["include_condition_states"]): bool,
         vol.Optional("extra_read_entities", default=current["extra_read_entities"]): selector.EntitySelector(selector.EntitySelectorConfig(multiple=True)),
         vol.Optional("viewer_user_id", default=current["viewer_user_id"]): selector.TextSelector(),

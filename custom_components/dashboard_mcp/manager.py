@@ -67,6 +67,8 @@ class DashboardManager:
         prepared = await self.index.query(args["query"]) if tool == "search_dashboard_context" else None
         options, metadata, data, records, states = await self.snapshot()
         configured_options = options
+        if "mode" in args and not options["allow_tool_override"]:
+            raise HomeAssistantError("Per-tool mode override is disabled.")
         options = {**options, "mode": args.get("mode", options["mode"])}
         redactor = Redactor(options["blocked_entities"])
         rendered = [render_record(r, options, states, False) for r in records]

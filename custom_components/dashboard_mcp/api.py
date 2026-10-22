@@ -41,11 +41,18 @@ class DashboardTool(llm.Tool):
     def __init__(self, manager, name):
         self.manager = manager
         self.name = name
-        self.description, self.parameters = TOOLS[name]
+        self.description, schema = TOOLS[name]
+        if manager.options["allow_tool_override"]:
+            self.parameters = schema
+        else:
+            # Hide mode completely from the agent-visible tool schema.
+            self.parameters = vol.Schema({key: value for key, value in schema.schema.items() if (key.schema if isinstance(key, vol.Marker) else key) != "mode"})
 
     async def async_call(self, hass, tool_input, llm_context):
         # HA 2026.9's APIInstance dispatch does not itself apply tool.parameters.
         try:
+            if "mode" in tool_input.tool_args and not self.manager.options["allow_tool_override"]:
+                raise HomeAssistantError("Per-tool mode override is disabled.")
             args = self.parameters(tool_input.tool_args)
         except vol.Invalid as exc:
             raise HomeAssistantError("Invalid dashboard tool arguments.") from exc
@@ -62,7 +69,9 @@ class DashboardAPI(llm.API):
             raise HomeAssistantError("Dashboard MCP is unloaded.")
         # Independent of any Assist-exposed entities or service execution tools.
         names = [n for n in TOOLS if n != "get_dashboard_yaml"]
-        if self.manager.options["enable_yaml_export"]:
+        if self.manager.options["enable_yaml_export"] and (
+            self.manager.options["mode"] == "smart" or self.manager.options["allow_tool_override"]
+        ):
             names.append("get_dashboard_yaml")
         return llm.APIInstance(api=self, api_prompt=PROMPT, llm_context=llm_context,
             tools=[DashboardTool(self.manager, name) for name in names])

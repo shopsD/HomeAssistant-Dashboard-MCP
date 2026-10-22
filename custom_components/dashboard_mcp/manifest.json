@@ -1,7 +1,7 @@
 {
   "domain": "dashboard_mcp",
   "name": "Dashboard MCP",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "config_flow": true,
   "dependencies": [
     "lovelace",
