@@ -220,10 +220,13 @@ class EmbeddingIndex:
                 self.wake.set()
                 return None
 
-    def search(self, rows, query, prepared):
+    def search(self, rows, query, prepared, search_mode="hybrid"):
+        if search_mode == "keyword":
+            return ranked_search(rows, query), "keyword"
         if prepared and self.status["state"] == "ready":
             vector, target, generation = prepared
             if target == self.target and generation == self.generation:
                 return hybrid_search(rows, query, vector, self.vectors,
-                                     self.manager.options["embedding_min_similarity"]), f"hybrid:{target}"
+                                     self.manager.options["embedding_min_similarity"],
+                                     include_keyword=search_mode == "hybrid"), f"{search_mode}:{target}"
         return ranked_search(rows, query), "keyword"
