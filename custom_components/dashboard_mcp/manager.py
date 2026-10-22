@@ -66,6 +66,8 @@ class DashboardManager:
         # Embed before taking the live permission snapshot; LocalAI may be slow.
         prepared = await self.index.query(args["query"]) if tool == "search_dashboard_context" else None
         options, metadata, data, records, states = await self.snapshot()
+        configured_options = options
+        options = {**options, "mode": args.get("mode", options["mode"])}
         redactor = Redactor(options["blocked_entities"])
         rendered = [render_record(r, options, states, False) for r in records]
         # Public revision derives from redacted content and current access decisions,
@@ -124,7 +126,7 @@ class DashboardManager:
             result = {"status": "ok", "representation": "resolved_redacted_yaml", "content_yaml": content}
         else:
             raise HomeAssistantError("Unknown dashboard tool.")
-        if options != self.options or not self.active:
+        if configured_options != self.options or not self.active:
             raise HomeAssistantError("Dashboard configuration changed during the request. Retry.")
         result = redactor.clean({**common, **result})
         max_chars = args.get("max_chars", 250000)
