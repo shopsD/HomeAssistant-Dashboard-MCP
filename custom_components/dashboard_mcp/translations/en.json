@@ -21,12 +21,10 @@
           "embedding_model": "Embedding model name",
           "embedding_batch_size": "Embedding batch size",
           "embedding_min_similarity": "Minimum cosine similarity",
-          "dumb_omit_restricted": "Dumb: omit restricted records",
-          "dumb_omit_undetermined": "Dumb: omit undetermined records",
-          "dumb_redact_restricted_entity_id": "Dumb: redact restricted entity IDs",
-          "dumb_redact_undetermined_entity_id": "Dumb: redact undetermined entity IDs",
           "dumb_restricted_condition": "Dumb: restricted condition handling",
-          "dumb_undetermined_condition": "Dumb: undetermined condition handling"
+          "dumb_undetermined_condition": "Dumb: undetermined condition handling",
+          "dumb_restricted_handling": "Dumb: restricted record handling",
+          "dumb_undetermined_handling": "Dumb: undetermined record handling"
         },
         "data_description": {
           "dashboards": "Only selected dashboards can be searched or read. New dashboards are not added automatically.",
@@ -42,12 +40,10 @@
           "embedding_model": "Exact model identifier registered in LocalAI. Changing the model or endpoint rebuilds the index.",
           "embedding_batch_size": "Documents per request, 1–64. Reduce if LocalAI runs out of memory.",
           "embedding_min_similarity": "Semantic match cutoff from -1 to 1. Default 0.45 is a starting point; calibrate with your model and catalogue.",
-          "dumb_omit_restricted": "Exclude restricted records before searching, ranking or pagination.",
-          "dumb_omit_undetermined": "Independently exclude records whose access cannot be determined, before searching or pagination.",
-          "dumb_redact_restricted_entity_id": "Replace the record's entity_id with [REDACTED_ENTITY] when access is restricted.",
-          "dumb_redact_undetermined_entity_id": "Replace the record's entity_id with [REDACTED_ENTITY] when access is undetermined.",
           "dumb_restricted_condition": "Keep: original condition; redact_entities: redact only this record's own entity ID within the condition; full_redact: hide the entire condition.",
-          "dumb_undetermined_condition": "Keep: original condition; redact_entities: redact only this record's own entity ID within the condition; full_redact: hide the entire condition."
+          "dumb_undetermined_condition": "Keep: original condition; redact_entities: redact only this record's own entity ID within the condition; full_redact: hide the entire condition.",
+          "dumb_restricted_handling": "Keep the record, redact only its entity_id, or omit it entirely before search and pagination.",
+          "dumb_undetermined_handling": "Keep the record, redact only its entity_id, or omit it entirely before search and pagination."
         }
       }
     },
@@ -76,12 +72,10 @@
           "embedding_model": "Embedding model name",
           "embedding_batch_size": "Embedding batch size",
           "embedding_min_similarity": "Minimum cosine similarity",
-          "dumb_omit_restricted": "Dumb: omit restricted records",
-          "dumb_omit_undetermined": "Dumb: omit undetermined records",
-          "dumb_redact_restricted_entity_id": "Dumb: redact restricted entity IDs",
-          "dumb_redact_undetermined_entity_id": "Dumb: redact undetermined entity IDs",
           "dumb_restricted_condition": "Dumb: restricted condition handling",
-          "dumb_undetermined_condition": "Dumb: undetermined condition handling"
+          "dumb_undetermined_condition": "Dumb: undetermined condition handling",
+          "dumb_restricted_handling": "Dumb: restricted record handling",
+          "dumb_undetermined_handling": "Dumb: undetermined record handling"
         },
         "data_description": {
           "dashboards": "Only selected dashboards can be searched or read. New dashboards are not added automatically.",
@@ -97,13 +91,27 @@
           "embedding_model": "Exact model identifier registered in LocalAI. Changing the model or endpoint rebuilds the index.",
           "embedding_batch_size": "Documents per request, 1–64. Reduce if LocalAI runs out of memory.",
           "embedding_min_similarity": "Semantic match cutoff from -1 to 1. Default 0.45 is a starting point; calibrate with your model and catalogue.",
-          "dumb_omit_restricted": "Exclude restricted records before searching, ranking or pagination.",
-          "dumb_omit_undetermined": "Independently exclude records whose access cannot be determined, before searching or pagination.",
-          "dumb_redact_restricted_entity_id": "Replace the record's entity_id with [REDACTED_ENTITY] when access is restricted.",
-          "dumb_redact_undetermined_entity_id": "Replace the record's entity_id with [REDACTED_ENTITY] when access is undetermined.",
           "dumb_restricted_condition": "Keep: original condition; redact_entities: redact only this record's own entity ID within the condition; full_redact: hide the entire condition.",
-          "dumb_undetermined_condition": "Keep: original condition; redact_entities: redact only this record's own entity ID within the condition; full_redact: hide the entire condition."
+          "dumb_undetermined_condition": "Keep: original condition; redact_entities: redact only this record's own entity ID within the condition; full_redact: hide the entire condition.",
+          "dumb_restricted_handling": "Keep the record, redact only its entity_id, or omit it entirely before search and pagination.",
+          "dumb_undetermined_handling": "Keep the record, redact only its entity_id, or omit it entirely before search and pagination."
         }
+      }
+    }
+  },
+  "selector": {
+    "condition_redaction": {
+      "options": {
+        "keep": "Keep original condition",
+        "redact_entities": "Redact this record's entity ID",
+        "full_redact": "Redact entire condition"
+      }
+    },
+    "record_handling": {
+      "options": {
+        "keep": "Keep record",
+        "redact_entity_id": "Redact entity ID",
+        "omit": "Omit record"
       }
     }
   }
