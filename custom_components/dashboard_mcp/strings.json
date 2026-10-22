@@ -20,7 +20,13 @@
           "embedding_api_key": "Embedding API key (optional)",
           "embedding_model": "Embedding model name",
           "embedding_batch_size": "Embedding batch size",
-          "embedding_min_similarity": "Minimum cosine similarity"
+          "embedding_min_similarity": "Minimum cosine similarity",
+          "dumb_omit_restricted": "Dumb: omit restricted records",
+          "dumb_omit_undetermined": "Dumb: omit undetermined records",
+          "dumb_redact_restricted_entity_id": "Dumb: redact restricted entity IDs",
+          "dumb_redact_undetermined_entity_id": "Dumb: redact undetermined entity IDs",
+          "dumb_restricted_condition": "Dumb: restricted condition handling",
+          "dumb_undetermined_condition": "Dumb: undetermined condition handling"
         },
         "data_description": {
           "dashboards": "Only selected dashboards can be searched or read. New dashboards are not added automatically.",
@@ -35,7 +41,13 @@
           "embedding_base_url": "Example: http://localai:8080/v1. The integration appends /embeddings.",
           "embedding_model": "Exact model identifier registered in LocalAI. Changing the model or endpoint rebuilds the index.",
           "embedding_batch_size": "Documents per request, 1–64. Reduce if LocalAI runs out of memory.",
-          "embedding_min_similarity": "Semantic match cutoff from -1 to 1. Default 0.45 is a starting point; calibrate with your model and catalogue."
+          "embedding_min_similarity": "Semantic match cutoff from -1 to 1. Default 0.45 is a starting point; calibrate with your model and catalogue.",
+          "dumb_omit_restricted": "Exclude restricted records before searching, ranking or pagination.",
+          "dumb_omit_undetermined": "Independently exclude records whose access cannot be determined, before searching or pagination.",
+          "dumb_redact_restricted_entity_id": "Replace the record's entity_id with [REDACTED_ENTITY] when access is restricted.",
+          "dumb_redact_undetermined_entity_id": "Replace the record's entity_id with [REDACTED_ENTITY] when access is undetermined.",
+          "dumb_restricted_condition": "Keep: original condition; redact_entities: redact only this record's own entity ID within the condition; full_redact: hide the entire condition.",
+          "dumb_undetermined_condition": "Keep: original condition; redact_entities: redact only this record's own entity ID within the condition; full_redact: hide the entire condition."
         }
       }
     },
@@ -63,7 +75,13 @@
           "embedding_api_key": "Embedding API key (optional)",
           "embedding_model": "Embedding model name",
           "embedding_batch_size": "Embedding batch size",
-          "embedding_min_similarity": "Minimum cosine similarity"
+          "embedding_min_similarity": "Minimum cosine similarity",
+          "dumb_omit_restricted": "Dumb: omit restricted records",
+          "dumb_omit_undetermined": "Dumb: omit undetermined records",
+          "dumb_redact_restricted_entity_id": "Dumb: redact restricted entity IDs",
+          "dumb_redact_undetermined_entity_id": "Dumb: redact undetermined entity IDs",
+          "dumb_restricted_condition": "Dumb: restricted condition handling",
+          "dumb_undetermined_condition": "Dumb: undetermined condition handling"
         },
         "data_description": {
           "dashboards": "Only selected dashboards can be searched or read. New dashboards are not added automatically.",
@@ -78,7 +96,13 @@
           "embedding_base_url": "Example: http://localai:8080/v1. The integration appends /embeddings.",
           "embedding_model": "Exact model identifier registered in LocalAI. Changing the model or endpoint rebuilds the index.",
           "embedding_batch_size": "Documents per request, 1–64. Reduce if LocalAI runs out of memory.",
-          "embedding_min_similarity": "Semantic match cutoff from -1 to 1. Default 0.45 is a starting point; calibrate with your model and catalogue."
+          "embedding_min_similarity": "Semantic match cutoff from -1 to 1. Default 0.45 is a starting point; calibrate with your model and catalogue.",
+          "dumb_omit_restricted": "Exclude restricted records before searching, ranking or pagination.",
+          "dumb_omit_undetermined": "Independently exclude records whose access cannot be determined, before searching or pagination.",
+          "dumb_redact_restricted_entity_id": "Replace the record's entity_id with [REDACTED_ENTITY] when access is restricted.",
+          "dumb_redact_undetermined_entity_id": "Replace the record's entity_id with [REDACTED_ENTITY] when access is undetermined.",
+          "dumb_restricted_condition": "Keep: original condition; redact_entities: redact only this record's own entity ID within the condition; full_redact: hide the entire condition.",
+          "dumb_undetermined_condition": "Keep: original condition; redact_entities: redact only this record's own entity ID within the condition; full_redact: hide the entire condition."
         }
       }
     }

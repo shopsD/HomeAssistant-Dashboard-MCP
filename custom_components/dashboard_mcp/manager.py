@@ -72,6 +72,12 @@ class DashboardManager:
         options = {**options, "mode": args.get("mode", options["mode"])}
         redactor = Redactor(options["blocked_entities"])
         rendered = [render_record(r, options, states, False) for r in records]
+        # Filter before searching, ranking, pagination, totals and revision hashing.
+        if options["mode"] == "dumb":
+            rendered = [
+                row for row in rendered
+                if not options.get(f"dumb_omit_{row['access']}", False)
+            ]
         # Public revision derives from redacted content and current access decisions,
         # never hashes of private entity IDs or hidden payload.
         search_rows, search_backend = ([], "keyword")
@@ -158,5 +164,12 @@ class DashboardManager:
         if access in {"allowed", "agent_evaluation_required"}:
             result["live"] = public_state(entity, states, redactor)
         if appearances:
-            result["appearances"] = [render_record(r, options, states, False) for r in appearances]
+            rendered_appearances = [render_record(r, options, states, False) for r in appearances]
+            if options["mode"] == "dumb":
+                rendered_appearances = [
+                    row for row in rendered_appearances
+                    if not options.get(f"dumb_omit_{row['access']}", False)
+                ]
+            if rendered_appearances:
+                result["appearances"] = rendered_appearances
         return result

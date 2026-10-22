@@ -136,6 +136,18 @@ def public_state(entity: str, states: dict, redactor: Redactor) -> dict:
     })
 
 
+def redact_record_condition(condition: str, entity: str, policy: str) -> str:
+    """Redact only occurrences of this record's entity ID."""
+    if policy == "full_redact":
+        return "[RESTRICTED_CONDITION]"
+    if policy == "redact_entities" and entity:
+        return re.sub(
+            r"(?<![a-zA-Z0-9_])" + re.escape(entity) + r"(?![a-zA-Z0-9_])",
+            lambda _: REDACTED, condition,
+        )
+    return condition
+
+
 def render_record(record: Record, options: dict, states: dict, include_states: bool = False) -> dict:
     redactor = Redactor(options["blocked_entities"])
     fields = redactor.clean(record.fields)
@@ -158,6 +170,12 @@ def render_record(record: Record, options: dict, states: dict, include_states: b
         for key in ("text", "service", "target"):
             if result[key]:
                 result[key] = "[RESTRICTED_CONTENT]"
+    if options["mode"] == "dumb" and status in {"restricted", "undetermined"}:
+        if options.get(f"dumb_redact_{status}_entity_id", False) and entity:
+            result["entity_id"] = REDACTED
+        result["condition"] = redact_record_condition(
+            result["condition"], entity, options.get(f"dumb_{status}_condition", "keep")
+        )
     if include_states:
         if entity:
             result["live"] = public_state(entity, states, redactor) if status in {"allowed", "agent_evaluation_required", "redacted"} else {"status": "withheld"}

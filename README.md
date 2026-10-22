@@ -13,6 +13,12 @@ Configure the integration in Home Assistant (Settings > Devices & services). Opt
 | Dashboards (`dashboards`) | None | Select which Lovelace dashboards can be read. |
 | Mode (`mode`) | `dumb` | Default for all tools: `dumb` evaluates visibility conditions server-side; `smart` supplies conditions for caller-side evaluation. |
 | Allow tool override (`allow_tool_override`) | Disabled | When enabled, expose the optional `mode` argument on tools. When disabled, the argument is hidden and rejected if supplied; the integration mode is enforced. |
+| Omit restricted (`dumb_omit_restricted`) | Disabled | In Dumb mode, omit restricted records before search and pagination. |
+| Omit undetermined (`dumb_omit_undetermined`) | Disabled | Independently omit records whose access cannot be determined. |
+| Redact restricted entity ID (`dumb_redact_restricted_entity_id`) | Disabled | Replace the `entity_id` field on restricted records with `[REDACTED_ENTITY]`. |
+| Redact undetermined entity ID (`dumb_redact_undetermined_entity_id`) | Disabled | Same, but only for undetermined records. |
+| Restricted condition (`dumb_restricted_condition`) | `keep` | `keep`, `redact_entities` (only occurrences of that record's own `entity_id`), or `full_redact` (entire condition). |
+| Undetermined condition (`dumb_undetermined_condition`) | `keep` | Independent condition-redaction policy for undetermined records, with the same choices. |
 | Blocked entities (`blocked_entities`) | None | Redact these entity IDs from tool output in either mode. |
 | Include condition states (`include_condition_states`) | Enabled | If a request sets `include_states: true`, include available state information for entities referenced by conditions, subject to redaction. |
 | Extra read entities (`extra_read_entities`) | None | Allow the read-only entity-state tools to retrieve specified entities outside the selected dashboards. |
@@ -49,7 +55,7 @@ Example:
 }
 ```
 
-In Dumb mode, records marked `restricted` or `undetermined` remain in results, but nonempty `text`, `service`, and `target` values are replaced with `[RESTRICTED_CONTENT]`. Only display records whose `access` equals `allowed` to a user who requires permission filtering. Smart mode marks records `agent_evaluation_required` and leaves evaluation to the caller.
+By default, in Dumb mode, records marked `restricted` or `undetermined` remain in results, but nonempty `text`, `service`, and `target` values are replaced with `[RESTRICTED_CONTENT]`. Only display records whose `access` equals `allowed` to a user who requires permission filtering. Smart mode marks records `agent_evaluation_required` and leaves evaluation to the caller. Dumb-mode omission runs before ranking, totals and pagination. When omission is disabled, the independent entity-ID and condition-redaction policies apply after original conditions have been evaluated. Other entity IDs referenced by a condition are not changed by `redact_entities`, and records with an empty `entity_id` are unchanged by that choice.
 
 **Security:** A mode override is not authentication or authorization. A caller with tool access can request Smart mode and receive condition-bearing records, so do not expose these tools directly to untrusted guests. YAML inspection exposes dashboard structure even when visibility conditions would hide it.
 
@@ -67,5 +73,3 @@ In Dumb mode, records marked `restricted` or `undetermined` remain in results, b
 The search and context tools support `dashboard_id`, `limit` (1-5000, default 500), `offset`, `revision`, `include_states`, `format` (`records` or `delimited`), and `max_chars` (default 250000; 0 disables the character limit). Exceeding a nonzero `max_chars` raises an error instead of truncating data. For pagination, pass the returned `revision` to subsequent requests so changes in the catalogue or permission decisions cause a restart instead of mixed results.
 
 `include_states` requests state details; it does not itself evaluate conditions or grant access.
-
-
