@@ -68,6 +68,8 @@ By default, in Dumb mode, records marked `restricted` or `undetermined` remain i
 | `get_entity_states` | Reads multiple permitted entity states. |
 | `get_dashboard_yaml` | Reads resolved, redacted dashboard YAML when enabled and effective mode is Smart. In configured Dumb mode it is only advertised if overrides are allowed, and requests still require `mode: smart`. |
 
+`search_dashboard_context` also accepts `search_mode`: `keyword` (literal query terms only, no embedding request), `semantic` (embedding similarity only), or `hybrid` (keyword and semantic merged with deduplication by record ID, the default). `semantic` and `hybrid` fall back to keyword search while embeddings are unavailable. Search mode is per request and does not change the embedding index configuration.
+
 The search and context tools support `dashboard_id`, `limit` (1-5000, default 500), `offset`, `revision`, `include_states`, `format` (`records` or `delimited`), and `max_chars` (default 250000; 0 disables the character limit). Exceeding a nonzero `max_chars` raises an error instead of truncating data. For pagination, pass the returned `revision` to subsequent requests so changes in the catalogue or permission decisions cause a restart instead of mixed results.
 
 `include_states` requests state details; it does not itself evaluate conditions or grant access.

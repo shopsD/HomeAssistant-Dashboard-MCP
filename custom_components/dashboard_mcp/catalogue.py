@@ -222,9 +222,9 @@ def search_chunks(record: dict) -> dict[str, str]:
             if (chunk := text[start:start + 2000]).strip()}
 
 
-def hybrid_search(records, query, vector, vectors, minimum):
+def hybrid_search(records, query, vector, vectors, minimum, include_keyword=True):
     """Rank current, rendered records only; never retrieve payload from the index."""
-    lexical = ranked_search(records, query)
+    lexical = ranked_search(records, query) if include_keyword else []
     scores = {r["id"]: 1 / (60 + rank) for rank, r in enumerate(lexical, 1)}
     semantic = []
     for row in records:

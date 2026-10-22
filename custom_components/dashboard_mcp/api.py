@@ -53,7 +53,7 @@ TOOLS = {
     "list_dashboards": ("List only the dashboards selected for this property database.", vol.Schema(MODE)),
     "search_dashboard_context": (
         "FIRST lookup for every property question or action. Search entity names, IDs, panels, rules and information. Returns complete conditions and evaluated permissions in dumb mode. Restricted/error is not a web fallback. Set include_states for current values.",
-        vol.Schema({vol.Required("query", description="Required search text, 1 to 300 characters. Matches dashboard names, sections, entities, rules and information."): vol.All(str, vol.Length(min=1, max=300)), **PAGE}),
+        vol.Schema({vol.Required("query", description="Required search text, 1 to 300 characters. Matches dashboard names, sections, entities, rules and information."): vol.All(str, vol.Length(min=1, max=300)), vol.Optional("search_mode", default="hybrid", description="Retrieval strategy: keyword uses literal query tokens only and never calls embeddings; semantic uses embedding similarity only; hybrid combines both and deduplicates by record ID. Default hybrid. If embeddings are unavailable, semantic and hybrid fall back to keyword."): vol.In(["keyword", "semantic", "hybrid"]), **PAGE}),
     ),
     "get_dashboard_context": ("Read a page of the property catalogue. Use revision from the previous page to prevent mixing changed permissions. Normally search first.", vol.Schema(PAGE)),
     "get_entity_state": ("Read one permitted entity's current state. Does not execute actions or grant control. Blocklist always applies.", vol.Schema({vol.Required("entity_id", description="Full Home Assistant entity ID to read, such as sensor.kitchen_temperature."): ENTITY, **MODE})),

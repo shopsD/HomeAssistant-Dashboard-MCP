@@ -64,7 +64,8 @@ class DashboardManager:
 
     async def call(self, tool: str, args: dict) -> dict:
         # Embed before taking the live permission snapshot; LocalAI may be slow.
-        prepared = await self.index.query(args["query"]) if tool == "search_dashboard_context" else None
+        search_mode = args.get("search_mode", "hybrid")
+        prepared = await self.index.query(args["query"]) if tool == "search_dashboard_context" and search_mode != "keyword" else None
         options, metadata, data, records, states = await self.snapshot()
         configured_options = options
         if "mode" in args and not options["allow_tool_override"]:
@@ -82,10 +83,10 @@ class DashboardManager:
         # never hashes of private entity IDs or hidden payload.
         search_rows, search_backend = ([], "keyword")
         if tool == "search_dashboard_context":
-            search_rows, search_backend = self.index.search(rendered, args["query"], prepared)
+            search_rows, search_backend = self.index.search(rendered, args["query"], prepared, search_mode)
         public_revision = revision([options["mode"], rendered, redactor.clean(metadata)])
         if tool == "search_dashboard_context":
-            public_revision = revision([public_revision, search_backend, args["query"],
+            public_revision = revision([public_revision, search_mode, search_backend, args["query"],
                                         args.get("dashboard_id"), [r["id"] for r in search_rows]])
         common = {"mode": options["mode"], "revision": public_revision, "checked_at": datetime.now(timezone.utc).isoformat(), "read_only": True}
         if tool == "list_dashboards":
