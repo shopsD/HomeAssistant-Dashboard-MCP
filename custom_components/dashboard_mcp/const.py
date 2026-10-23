@@ -14,6 +14,7 @@ DEFAULT_OPTIONS = {
     "mode": "dumb",
     "dumb_restricted_handling": "keep",
     "dumb_undetermined_handling": "keep",
+    "dumb_expose_undetermined": False,
     "dumb_restricted_condition": "keep",
     "dumb_undetermined_condition": "keep",
     "allow_tool_override": False,
