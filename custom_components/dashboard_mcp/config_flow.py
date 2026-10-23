@@ -27,6 +27,7 @@ def schema(hass, current):
         vol.Required("mode", default=current["mode"]): selector.SelectSelector(selector.SelectSelectorConfig(options=[{"value": "dumb", "label": "Dumb — server evaluates conditions"}, {"value": "smart", "label": "Smart — agent evaluates conditions"}])),
         vol.Required("dumb_restricted_handling", default=current["dumb_restricted_handling"]): selector.SelectSelector(selector.SelectSelectorConfig(options=["keep", "redact_entity_id", "omit"], mode="dropdown", translation_key="record_handling")),
         vol.Required("dumb_undetermined_handling", default=current["dumb_undetermined_handling"]): selector.SelectSelector(selector.SelectSelectorConfig(options=["keep", "redact_entity_id", "omit"], mode="dropdown", translation_key="record_handling")),
+        vol.Required("dumb_expose_undetermined", default=current["dumb_expose_undetermined"]): bool,
         vol.Required("dumb_restricted_condition", default=current["dumb_restricted_condition"]): selector.SelectSelector(selector.SelectSelectorConfig(options=["keep", "redact_entities", "full_redact"], mode="dropdown", translation_key="condition_redaction")),
         vol.Required("dumb_undetermined_condition", default=current["dumb_undetermined_condition"]): selector.SelectSelector(selector.SelectSelectorConfig(options=["keep", "redact_entities", "full_redact"], mode="dropdown", translation_key="condition_redaction")),
         vol.Required("allow_tool_override", default=current["allow_tool_override"]): bool,

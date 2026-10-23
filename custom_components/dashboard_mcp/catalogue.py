@@ -166,7 +166,9 @@ def render_record(record: Record, options: dict, states: dict, include_states: b
     result["access"] = status
     result["reason"] = reason
     # Retain the record and section, while withholding gated payload in dumb mode.
-    if options["mode"] == "dumb" and status in {"restricted", "undetermined"}:
+    if options["mode"] == "dumb" and status in {"restricted", "undetermined"} and not (
+        status == "undetermined" and options.get("dumb_expose_undetermined", False)
+    ):
         for key in ("text", "service", "target"):
             if result[key]:
                 result[key] = "[RESTRICTED_CONTENT]"

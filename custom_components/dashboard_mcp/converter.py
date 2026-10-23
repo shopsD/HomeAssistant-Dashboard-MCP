@@ -210,6 +210,24 @@ def mk_or(*conditions: Cond) -> Cond:
         result = _simplify_branches(result)
     return _from_dnf(result)
 
+def negate_condition(condition: Cond) -> Cond:
+    """Negate supported conditions without discarding unknown access checks."""
+    if condition.op == "true":
+        return FALSE
+    if condition.op == "false":
+        return TRUE
+    if condition.op == "and":
+        return mk_or(*(negate_condition(child) for child in condition.args))
+    if condition.op == "or":
+        return mk_and(*(negate_condition(child) for child in condition.args))
+    if condition.op == "atom":
+        atom = condition.args[0]
+        if atom.kind == "state" and atom.op in {"=", "!="}:
+            return atom_condition(Atom("state", atom.entity, "!=" if atom.op == "=" else "=", atom.value))
+    # Preserve unsupported constructs as unknown rather than assuming access.
+    return atom_condition(Atom("raw", raw=min_json({"unsupported_negation": render_condition(condition)})))
+
+
 def normalise_condition(raw: Any) -> Cond:
     if raw is None:
         return TRUE
@@ -219,22 +237,30 @@ def normalise_condition(raw: Any) -> Cond:
         return atom_condition(Atom("raw", raw=min_json(raw)))
     ctype = raw.get("condition")
     keys_by_type = {
-        "state": {"condition", "entity", "state", "state_not"},
-        "numeric_state": {"condition", "entity", "above", "below"},
+        "state": {"condition", "entity", "entity_id", "state", "state_not"},
+        "numeric_state": {"condition", "entity", "entity_id", "above", "below"},
         "user": {"condition", "users"},
         "and": {"condition", "conditions"},
         "or": {"condition", "conditions"},
+        "not": {"condition", "conditions"},
     }
     if ctype in keys_by_type and set(raw) - keys_by_type[ctype]:
         return atom_condition(Atom("raw", raw=min_json(raw)))
-    if "attribute" in raw or ctype == "not":
+    if "attribute" in raw:
         return atom_condition(Atom("raw", raw=min_json(raw)))
     if ctype == "and":
         return mk_and(*(normalise_condition(x) for x in raw.get("conditions", [])))
     if ctype == "or":
         return mk_or(*(normalise_condition(x) for x in raw.get("conditions", [])))
+    if ctype == "not":
+        children = raw.get("conditions")
+        if not isinstance(children, list) or not children:
+            return atom_condition(Atom("raw", raw=min_json(raw)))
+        return negate_condition(mk_and(*(normalise_condition(x) for x in children)))
     if ctype == "state":
-        entity = str(raw.get("entity", ""))
+        entity = str(raw.get("entity", raw.get("entity_id", "")))
+        if not ENTITY_RE.fullmatch(entity) or ("entity" in raw and "entity_id" in raw):
+            return atom_condition(Atom("raw", raw=min_json(raw)))
         result: list[Cond] = []
         if "state" in raw:
             states = raw["state"] if isinstance(raw["state"], list) else [raw["state"]]
@@ -244,7 +270,9 @@ def normalise_condition(raw: Any) -> Cond:
             result.extend(atom_condition(Atom("state", entity, "!=", str(v))) for v in states)
         return mk_and(*result) if result else atom_condition(Atom("raw", raw=min_json(raw)))
     if ctype == "numeric_state":
-        entity = str(raw.get("entity", ""))
+        entity = str(raw.get("entity", raw.get("entity_id", "")))
+        if not ENTITY_RE.fullmatch(entity) or ("entity" in raw and "entity_id" in raw):
+            return atom_condition(Atom("raw", raw=min_json(raw)))
         result: list[Cond] = []
         if raw.get("above") is not None:
             result.append(atom_condition(Atom("numeric", entity, ">", str(raw["above"]))))

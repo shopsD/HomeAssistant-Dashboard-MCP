@@ -24,7 +24,8 @@
           "dumb_restricted_condition": "Dumb: restricted condition handling",
           "dumb_undetermined_condition": "Dumb: undetermined condition handling",
           "dumb_restricted_handling": "Dumb: restricted record handling",
-          "dumb_undetermined_handling": "Dumb: undetermined record handling"
+          "dumb_undetermined_handling": "Dumb: undetermined record handling",
+          "dumb_expose_undetermined": "Dumb: expose content when access is undetermined"
         },
         "data_description": {
           "dashboards": "Only selected dashboards can be searched or read. New dashboards are not added automatically.",
@@ -43,7 +44,8 @@
           "dumb_restricted_condition": "Keep: Show the full condition in the output; Redact Entity: Redact only this record's own entity ID within the condition; Redact Condition: Redact the entire condition.",
           "dumb_undetermined_condition": "Keep: original condition; Redact Entity: Redact only this record's own entity ID within the condition; Redact Condition: Redact the entire condition.",
           "dumb_restricted_handling": "Keep the record in the search results, redact only its entity_id, or omit it entirely.",
-          "dumb_undetermined_handling": "Keep the record in the search results, redact only its entity_id, or omit it entirely."
+          "dumb_undetermined_handling": "Keep the record in the search results, redact only its entity_id, or omit it entirely.",
+          "dumb_expose_undetermined": "Off (default): redact text, service and target for undetermined access. On: expose these fields while keeping access as undetermined. Restricted content is always withheld; exposing unknown-access content may reveal protected information."
         }
       }
     },
@@ -75,7 +77,8 @@
           "dumb_restricted_condition": "Dumb: restricted condition handling",
           "dumb_undetermined_condition": "Dumb: undetermined condition handling",
           "dumb_restricted_handling": "Dumb: restricted record handling",
-          "dumb_undetermined_handling": "Dumb: undetermined record handling"
+          "dumb_undetermined_handling": "Dumb: undetermined record handling",
+          "dumb_expose_undetermined": "Dumb: expose content when access is undetermined"
         },
         "data_description": {
           "dashboards": "Only selected dashboards can be searched or read. New dashboards are not added automatically.",
@@ -94,7 +97,8 @@
           "dumb_restricted_condition": "Keep: Show the full condition in the output; Redact Entity: Redact only this record's own entity ID within the condition; Redact Condition: Redact the entire condition.",
           "dumb_undetermined_condition": "Keep: original condition; Redact Entity: Redact only this record's own entity ID within the condition; Redact Condition: Redact the entire condition.",
           "dumb_restricted_handling": "Keep the record in the search results, redact only its entity_id, or omit it entirely.",
-          "dumb_undetermined_handling": "Keep the record in the search results, redact only its entity_id, or omit it entirely."
+          "dumb_undetermined_handling": "Keep the record in the search results, redact only its entity_id, or omit it entirely.",
+          "dumb_expose_undetermined": "Off (default): redact text, service and target for undetermined access. On: expose these fields while keeping access as undetermined. Restricted content is always withheld; exposing unknown-access content may reveal protected information."
         }
       }
     }
